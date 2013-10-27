@@ -1,0 +1,20 @@
+{
+    "groups":[
+        {
+            "name":"Pierwsza",
+            "description" : "Opis 1",
+            "source_dir":"/home/michal/projects/Backup/tst_home/one",
+            "dest_dir":"file:///home/michal/projects/Backup/tst_backup/one",
+            "duplicity_opts": ["--full-if-older-than", "1M"]
+        },
+        {
+            "name":"Druga",
+            "description" : "Opis 2",
+            "source_dir":"/home/michal/projects/Backup/tst_home/two",
+            "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
+            "duplicity_opts": ["--full-if-older-than", "7D"]
+        }
+    ],
+    "tmp_dir":"/home/michal/projects/Backup/tmp",
+    "encryption_key":"SECRET_KEY"
+}
