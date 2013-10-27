@@ -7,8 +7,13 @@ import subprocess
 from urlparse import urlparse
 import logging
 import datetime
+import StringIO
+import smtplib
+from email.mime.text import MIMEText
 
 LOG_LEVEL = logging.DEBUG
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="A duplicity helper for backups.")
@@ -30,21 +35,44 @@ def main():
         group = args.group
     else:
         group = None
-    log_file_name = ('%s.log') % datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
     if args.log_dir:
-        logging.basicConfig(filename=os.path.join(args.log_dir,log_file_name), level=LOG_LEVEL)
+        log_dir = args.log_dir
     else:
         home = os.path.expanduser("~")
-        logging.basicConfig(filename=os.path.join(home,log_file_name), level=LOG_LEVEL)
+        log_dir = home
+
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel(LOG_LEVEL)
+    log_file_name = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    logFormatter = logging.Formatter(logging.BASIC_FORMAT)
+
+    fileHandler = logging.FileHandler("{0}/{1}.log".format(log_dir, log_file_name))
+    fileHandler.setFormatter(logFormatter)
+    fileHandler.setLevel(LOG_LEVEL)
+    rootLogger.addHandler(fileHandler)
+
+    logStream = StringIO.StringIO()
+    streamHandler = logging.StreamHandler(logStream)
+    streamHandler.setFormatter(logFormatter)
+    streamHandler.setLevel(LOG_LEVEL)
+    rootLogger.addHandler(streamHandler)
+
     logging.debug('Config file: %s' % config_file)
     logging.debug('Processing %s group(s)' % (group if group is not None else 'all'))
 
     if args.subparser_name == 'backup':
         logging.debug('Performing backup...')
-        __backup__(config_file,group)
+        status = __backup__(config_file,group)
+        streamHandler.flush()
+        logStream.flush()
+        __send_mail__(config_file,status,logStream)
     else:
         logging.debug('Performing restore...')
 
+#    rootLogger.removeHandler(streamHandler)
+#    print logStream.getvalue()
+#
 def __backup__(config_file,group=None):
     json_data=open(config_file).read()
     config = json.loads(json_data)
@@ -115,6 +143,25 @@ def __backup__(config_file,group=None):
         logging.info('==========================================')
         global_status &= status
     return global_status
+
+def __send_mail__(config_file, status, logStream):
+    json_data=open(config_file).read()
+    config = json.loads(json_data)
+    if config.has_key('mail'):
+        mail_cfg = config['mail']
+        msg = MIMEText(logStream.getvalue())
+        status_txt = 'SUCCESS' if status else 'FAILURE'
+        msg['Subject'] = '%s backup' % status_txt
+        msg['From'] = 'Duptool'
+        msg['To'] = mail_cfg['to']
+        s = smtplib.SMTP(mail_cfg['smtp_server'],587)
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        s.login(mail_cfg['login'],mail_cfg['password'])
+        s.sendmail('Duptool', [mail_cfg['to']], msg.as_string())
+        s.quit()
+
 
 def __get_home__():
     home = os.path.expanduser("~")

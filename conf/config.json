@@ -17,6 +17,7 @@
             "clean_cmd": ["remove-all-but-n-full","1"]
         }
     ],
+    "mail": { "smtp_server": "smtp.gmail.com", "login": "", "password": "", "to" : ""},
     "tmp_dir":"/home/michal/projects/Backup/tmp",
     "vol_size": "1G",
     "encryption_key":"SECRET_KEY"

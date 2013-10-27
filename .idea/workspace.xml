@@ -20,10 +20,10 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="duptool.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="duptool.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/duptool.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="86" selection-start="1300" selection-end="1300" vertical-scroll-proportion="0.925">
+            <state line="155" column="34" selection-start="5497" selection-end="5497" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#23#38#0" expanded="true" />
               </folding>
@@ -31,10 +31,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.json" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="config.json" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/conf/config.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="5" selection-start="805" selection-end="819" vertical-scroll-proportion="0.0">
+            <state line="19" column="84" selection-start="812" selection-end="812" vertical-scroll-proportion="0.475">
               <folding />
             </state>
           </provider>
@@ -50,8 +50,8 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/conf/config.json" />
         <option value="$PROJECT_DIR$/duptool.py" />
+        <option value="$PROJECT_DIR$/conf/config.json" />
       </list>
     </option>
   </component>
@@ -128,6 +128,21 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../kiwii/backend/backend" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <module name="Backup" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <method />
+    </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -249,19 +264,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conf/config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="5" selection-start="805" selection-end="819" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/duptool.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="86" selection-start="1300" selection-end="1300" vertical-scroll-proportion="0.925">
+        <state line="155" column="34" selection-start="5497" selection-end="5497" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="e#23#38#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conf/config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="84" selection-start="812" selection-end="812" vertical-scroll-proportion="0.475">
+          <folding />
         </state>
       </provider>
     </entry>
