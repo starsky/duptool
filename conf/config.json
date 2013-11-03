@@ -5,6 +5,7 @@
             "description" : "Opis 1",
             "source_dir":"/home/michal/projects/Backup/tst_home/one",
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/one",
+            "filter": [{"include": "/home/michal/projects/Backup/tst_home/one/a.txt"},{"exclude": "**"}],
             "duplicity_opts": ["--full-if-older-than", "1M"],
             "clean_cmd": ["remove-all-but-n-full","1"]
         },
@@ -15,9 +16,17 @@
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
             "duplicity_opts": ["--full-if-older-than", "7D"],
             "clean_cmd": ["remove-all-but-n-full","1"]
+        },
+        {
+            "name":"Trzecia",
+            "description" : "Opis 2",
+            "source_dir":"/home/michal/projects/Backup/tst_home/two",
+            "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
+            "duplicity_opts": ["--full-if-older-than", "7D"],
+            "clean_cmd": ["remove-all-but-n-full","1"],
+            "auto_run" : false
         }
     ],
-    "mail": { "smtp_server": "smtp.gmail.com", "login": "", "password": "", "to" : ""},
     "tmp_dir":"/home/michal/projects/Backup/tmp",
     "vol_size": "1G",
     "encryption_key":"SECRET_KEY"

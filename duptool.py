@@ -20,6 +20,7 @@ def main():
     parser.add_argument('-c','--config',help='Config file location.')
     parser.add_argument('-g','--group',help='Group name.')
     parser.add_argument('-l','--log_dir',help='Directory to save log file.')
+    parser.add_argument('-r','--dry_run',help='Dry run w/o making actual action',action="store_true")
     sub_parsers = parser.add_subparsers(dest='subparser_name')
     backup_parser = sub_parsers.add_parser('backup',help='preform backup')
     restore_parser = sub_parsers.add_parser('restore',help='preform restore')
@@ -40,7 +41,7 @@ def main():
         log_dir = args.log_dir
     else:
         home = os.path.expanduser("~")
-        log_dir = home
+        log_dir = os.path.join(home,'.duptool')
 
     rootLogger = logging.getLogger()
     rootLogger.setLevel(LOG_LEVEL)
@@ -63,17 +64,17 @@ def main():
 
     if args.subparser_name == 'backup':
         logging.debug('Performing backup...')
-        status = __backup__(config_file,group)
+        status = __backup__(config_file,group,args.dry_run)
         streamHandler.flush()
         logStream.flush()
-        __send_mail__(config_file,status,logStream)
+        __send_mail__(config_file,status,logStream,args.dry_run)
     else:
         logging.debug('Performing restore...')
 
 #    rootLogger.removeHandler(streamHandler)
 #    print logStream.getvalue()
 #
-def __backup__(config_file,group=None):
+def __backup__(config_file,group=None,dry_run=False):
     json_data=open(config_file).read()
     config = json.loads(json_data)
 
@@ -85,13 +86,14 @@ def __backup__(config_file,group=None):
     if group is not None:
         if group in [g['name'] for g in groups]:
             groups = [g for g in groups if g['name'] == group]
+            del groups[0]['auto_run']
         else:
             err_msg = "No such group %s in config" % group
             print err_msg
             logging.error(err_msg)
             exit(-100)
     global_status = True
-    for g in groups:
+    for g in [gr for gr in groups if not gr.has_key('auto_run') or gr['auto_run'] == True]:
         status = True
         logging.info("Backing up %s" % g['name'])
         if not os.path.exists(urlparse(g['dest_dir']).path):
@@ -103,12 +105,19 @@ def __backup__(config_file,group=None):
         #Backup
         CMD =  ['duplicity']
         CMD.extend(g['duplicity_opts'])
+        if g.has_key('vol_size'):
+            CMD.append('--volsize')
+            CMD.append(g['vol_size'])
+        if g.has_key('filter'):
+            CMD.extend([e for t in map(__create_filter_cmd__,g['filter']) for e in t])
         CMD.append(g['source_dir'])
         CMD.append(g['dest_dir'])
         if config.has_key('tmp_dir'):
             CMD.append('--tempdir')
             CMD.append(config['tmp_dir'])
-        logging.debug('CMD: %s' % CMD)
+        logging.debug('CMD: %s' % " ".join([c for c in CMD]))
+        if dry_run:
+            return False
         p = subprocess.Popen(CMD,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env_var)
         (stdout,stderr) = p.communicate()
         ret_code = p.returncode
@@ -117,19 +126,30 @@ def __backup__(config_file,group=None):
         logging.info(stdout)
         logging.info(stderr)
         #Verifying backup
-        VERIFY_CMD = ['duplicity','verify',g['dest_dir'],g['source_dir']]
-        p = subprocess.Popen(VERIFY_CMD,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env_var)
-        (stdout,stderr) = p.communicate()
-        ret_code = p.returncode
-        status &= ret_code == 0
-        logging.info('Duplicity verify finished with code: %d' % ret_code)
-        logging.info(stdout)
-        logging.info(stderr)
+        if g.has_key('verify') and g['verify'] == True:
+            VERIFY_CMD = ['duplicity','verify']
+            if g.has_key('filter'):
+                VERIFY_CMD.extend([e for t in map(__create_filter_cmd__,g['filter']) for e in t] )
+            VERIFY_CMD.append(g['dest_dir'])
+            VERIFY_CMD.append(g['source_dir'])
+            if config.has_key('tmp_dir'):
+                VERIFY_CMD.append('--tempdir')
+                VERIFY_CMD.append(config['tmp_dir'])
+            p = subprocess.Popen(VERIFY_CMD,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env_var)
+            (stdout,stderr) = p.communicate()
+            ret_code = p.returncode
+            status &= ret_code == 0
+            logging.info('Duplicity verify finished with code: %d' % ret_code)
+            logging.info(stdout)
+            logging.info(stderr)
         #Clean up command
         if g.has_key('clean_cmd'):
             CLEAN_CMD = ['duplicity']
             CLEAN_CMD.extend(g['clean_cmd'])
             CLEAN_CMD.append(g['dest_dir'])
+            if config.has_key('tmp_dir'):
+                CLEAN_CMD.append('--tempdir')
+                CLEAN_CMD.append(config['tmp_dir'])
             p = subprocess.Popen(CLEAN_CMD,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env_var)
             (stdout,stderr) = p.communicate()
             ret_code = p.returncode
@@ -144,7 +164,13 @@ def __backup__(config_file,group=None):
         global_status &= status
     return global_status
 
-def __send_mail__(config_file, status, logStream):
+def __create_filter_cmd__(filter_val):
+    key = filter_val.keys()[0]
+    return ['--' + key,filter_val[key]]
+
+def __send_mail__(config_file, status, logStream,dry_run=False):
+    if dry_run:
+        return
     json_data=open(config_file).read()
     config = json.loads(json_data)
     if config.has_key('mail'):
