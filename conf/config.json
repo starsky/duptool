@@ -15,7 +15,8 @@
             "source_dir":"/home/michal/projects/Backup/tst_home/two",
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
             "duplicity_opts": ["--full-if-older-than", "7D"],
-            "clean_cmd": ["remove-all-but-n-full","1"]
+            "clean_cmd": ["remove-all-but-n-full","1"],
+            "auto_run" : true
         },
         {
             "name":"Trzecia",
