@@ -7,7 +7,8 @@
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/one",
             "filter": [{"include": "/home/michal/projects/Backup/tst_home/one/a.txt"},{"exclude": "**"}],
             "duplicity_opts": ["--full-if-older-than", "1M"],
-            "clean_cmd": ["remove-all-but-n-full","1"]
+            "clean_cmd": ["remove-all-but-n-full","1"],
+            "glacier": true
         },
         {
             "name":"Druga",
@@ -16,7 +17,8 @@
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
             "duplicity_opts": ["--full-if-older-than", "7D"],
             "clean_cmd": ["remove-all-but-n-full","1"],
-            "auto_run" : true
+            "auto_run" : true,
+            "glacier": true
         },
         {
             "name":"Trzecia",
@@ -30,5 +32,9 @@
     ],
     "tmp_dir":"/home/michal/projects/Backup/tmp",
     "vol_size": "1G",
-    "encryption_key":"SECRET_KEY"
+    "encryption_key":"SECRET_KEY",
+    "glacier": {
+        "aws_id": "",
+        "aws_secret": ""
+    }
 }

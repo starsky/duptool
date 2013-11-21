@@ -162,6 +162,12 @@ def __backup__(config_file,group=None,dry_run=False):
         logging.info('Backing up %s %s' % (g['name'], result_msg))
         logging.info('==========================================')
         global_status &= status
+
+    for g in [gr for gr in groups if not gr.has_key('auto_run') or gr['auto_run'] == True]:
+        if g.get('glacier'):
+            glacier_sync(urlparse(g['dest_dir']).path, g['name'],
+                prefix=g['name'], conf=config['glacier'])
+
     return global_status
 
 def __create_filter_cmd__(filter_val):
@@ -195,6 +201,52 @@ def __get_home__():
     if not os.path.exists(conf_dir):
         os.mkdir(os.path.join(home,'.duptool'))
     return os.path.join(conf_dir,'config.json')
+
+def glacier_sync(folder, vault, prefix=None, conf=None, dry_run=False):
+    import glacier_cli.glacier as gl
+    import re
+    import time
+
+    delete_period = 35 * 24 * 60 * 60 ## 35 days in seconds after that delete
+                                      # from glacier is free
+
+    default_args = []
+    if conf is not None:
+        os.environ['AWS_ACCESS_KEY_ID'] = conf['aws_id']
+        os.environ['AWS_SECRET_ACCESS_KEY'] = conf['aws_secret']
+        if conf.get('aws_region'):
+            default_args.extend(['--region', conf['aws_region']])
+    if prefix is None:
+        prefix = folder
+
+    content = os.listdir(folder)
+    files = set(unicode(f) for f in content if os.path.isfile(os.path.join(folder, f)))
+
+    app = gl.App(args=['archive', 'list', '--detailed', vault], quiet=True)
+    archives = app.args.func()
+    to_sync = files - set(re.search(r'^(\[.*\])*[\ ]?(\S+)', a.name).groups()[1] for a in archives)
+
+    for f in to_sync:
+        args = ['archive', 'upload', '--name', '[%s] %s' % (prefix, f), vault, os.path.join(folder, f)]
+        args.extend(default_args)
+        if dry_run:
+            logging.debug(args)
+        else:
+            app = gl.App(args=args, quiet=True)
+            archive_id = app.args.func()
+            logging.info('%s uploaded to Glacier with id: %s' % (f, archive_id))
+
+    to_delete = set(a.name for a in archives if (time.time() - a.created_here) > delete_period) \
+                - set('[%s] %s' % (prefix, f) for f in files)
+    for a in to_delete:
+        args = ['archive', 'delete', vault, a]
+        args.extend(default_args)
+        if dry_run:
+            logging.debug(args)
+        else:
+            app = gl.App(args=args, quiet=True)
+            app.args.func()
+            logging.info('%s removed from Glacier.' % a)
 
 if __name__ == "__main__":
     main()
