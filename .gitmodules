@@ -1,0 +1,3 @@
+[submodule "glacier_cli"]
+	path = glacier_cli
+	url = git@github.com:starsky/glacier-cli.git
