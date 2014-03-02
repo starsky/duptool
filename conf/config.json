@@ -1,19 +1,24 @@
 {
+    "file_groups": {
+        "fg1" : ["/home/michal/projects/Backup/tst_home/a.txt", "/home/michal/projects/Backup/tst_home/b.txt"],
+        "fg2" : ["/home/michal/projects/Backup/tst_home/c.txt", "/home/michal/projects/Backup/tst_home/d.txt"]
+    },
     "groups":[
         {
             "name":"Pierwsza",
             "description" : "Opis 1",
-            "source_dir":"/home/michal/projects/Backup/tst_home/one",
+            "source_dir":"/home/michal/projects/Backup/tst_home/",
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/one",
-            "filter": [{"include": "/home/michal/projects/Backup/tst_home/one/a.txt"},{"exclude": "**"}],
+            "filter": [{"include": "$fg1"},{"exclude": "**"}],
             "duplicity_opts": ["--full-if-older-than", "1M"],
             "clean_cmd": ["remove-all-but-n-full","1"]
         },
         {
             "name":"Druga",
             "description" : "Opis 2",
-            "source_dir":"/home/michal/projects/Backup/tst_home/two",
+            "source_dir":"/home/michal/projects/Backup/tst_home/",
             "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
+            "filter": [{"exclude": "$fg1"}],
             "duplicity_opts": ["--full-if-older-than", "7D"],
             "clean_cmd": ["remove-all-but-n-full","1"],
             "auto_run" : true
@@ -21,8 +26,9 @@
         {
             "name":"Trzecia",
             "description" : "Opis 2",
-            "source_dir":"/home/michal/projects/Backup/tst_home/two",
-            "dest_dir":"file:///home/michal/projects/Backup/tst_backup/two",
+            "source_dir":"/home/michal/projects/Backup/tst_home/",
+            "dest_dir":"file:///home/michal/projects/Backup/tst_backup/three",
+            "filter": [{"include": "$fg2"},{"exclude": "**"}],
             "duplicity_opts": ["--full-if-older-than", "7D"],
             "clean_cmd": ["remove-all-but-n-full","1"],
             "auto_run" : false
