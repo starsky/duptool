@@ -1,2 +1,3 @@
 /tst_backup
 .idea
+*.pyc

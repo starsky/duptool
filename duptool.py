@@ -188,7 +188,7 @@ def __get_default_config_dir__():
 
 
 def glacier_sync(folder, vault, prefix=None, conf=None, dry_run=False):
-    import glacier_cli.glacier as gl
+    import duptool_glacier_cli.glacier as gl
     import re
     import time
 
