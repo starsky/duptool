@@ -1,0 +1,4 @@
+include *.txt
+include duptool_cli/*.png
+include duptool_glacier_cli/COPYING
+include duptool_glacier_cli/README.md

@@ -5,7 +5,7 @@ setup(
     version='0.1.0',
     author='Michal Koperski',
     author_email='m.koperski@gmail.com',
-    packages=['duptool_glacier_cli'],
+    packages=['duptool_glacier_cli', 'duptool_cli'],
     scripts=['bin/duptool_notification.py', 'bin/duptool.py'],
     url='http://pypi.python.org/pypi/DupTool/',
     license='LICENSE.txt',
