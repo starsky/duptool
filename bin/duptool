@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+import duptool.duptool
+
+if __name__ == "__main__":
+    duptool.duptool.run_from_command_line()

@@ -5,7 +5,7 @@ from os.path import join
 import os
 from datetime import datetime
 import pynotify
-import duptool_cli
+import duptool
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
         diff = datetime.now().date() - log_datetime.date()
         diff_threshold = 7
         if diff.days > diff_threshold:
-            icon_path = os.path.join(os.path.dirname(os.path.realpath(duptool_cli.__file__)), 'dialog-important-2.png')
+            icon_path = os.path.join(os.path.dirname(os.path.realpath(duptool.__file__)), 'dialog-important-2.png')
             print icon_path
             pynotify.init("DUPTOOL")
             notice = pynotify.Notification('Backup reminder',

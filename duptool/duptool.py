@@ -10,10 +10,11 @@ import datetime
 import StringIO
 import itertools
 
+
 LOG_LEVEL = logging.DEBUG
 
 
-def main():
+def run_from_command_line():
     parser = argparse.ArgumentParser(description="A duplicity helper for backups.")
     parser.add_argument('-c', '--config', help='Config file location.')
     parser.add_argument('-g', '--group', help='Backup group name.')
@@ -231,10 +232,6 @@ def glacier_sync(folder, vault, prefix=None, conf=None, dry_run=False):
             app = gl.App(args=args, quiet=True)
             app.args.func()
             logging.info('%s removed from Glacier.' % a)
-
-
-if __name__ == "__main__":
-    main()
 
 
 #        #Verifying backup
